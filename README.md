@@ -115,8 +115,18 @@ Example:
 /* user document */
 {
     _id: '/* user id */',
-    access_groups: ['/* group id */', '/* another group id */']
+    access_groups: ['group_id', 'another_group_id']
 }
 ```
 
-There is 
+There is no requirements about access groups as long as you put the same ID in role array and access_groups array.
+
+## Admin override mode
+
+To activate admin override mode put this somewhere on the server:
+
+```js
+Vazco.Access.adminOverride = true;
+```
+
+Now every user with flag **admin: true** can skip access check.
