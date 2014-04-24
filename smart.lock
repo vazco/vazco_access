@@ -1,0 +1,15 @@
+{
+  "meteor": {},
+  "dependencies": {
+    "basePackages": {
+      "vazco-access": {
+        "path": "."
+      }
+    },
+    "packages": {
+      "vazco-access": {
+        "path": "."
+      }
+    }
+  }
+}
