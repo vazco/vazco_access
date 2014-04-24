@@ -189,4 +189,8 @@ Vazco.Access.removeSAG = function(SAGName) {
     }
 };
 
+//------------------- Variables ---------------
+
+// overrides access check if user doc has boolean "admin" field with value true
+// false by default
 Vazco.Access.adminOverride = false;
