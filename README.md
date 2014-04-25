@@ -151,11 +151,21 @@ Now every user with flag **admin: true** can skip access check.
 
 ###Vazco.Access.resolveArray(access_array, user_object_or_ID)
 
+```js
+/* example */
+Vazco.Access.resolveArray(['user_id', 'group_id', 'moderators'], Meteor.userId());
+```
+
 Returns true or false.
 
 To use outside built in function.
 
 ###Vazco.Access.resolve(type, document, user_object_or_ID)
+
+```js
+/* example */
+Vazco.Access.resolve('update', Collection.findOne({_id: 'xxx'}), Meteor.user());
+```
 
 Returns true or false.
 
