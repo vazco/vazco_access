@@ -160,6 +160,7 @@ To use outside built in function.
 Returns true or false.
 
 **type** - is an string corresponding to field in access object (show, update, remove etc.) 
+
 **document** - document with access object (if not present this will return false)
 
 Same as resolveArray but for use with documents.
