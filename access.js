@@ -1,78 +1,33 @@
-Vazco = {};
 Vazco.Access = {};
-
-/**
- * Use inside Meteor.publish() callback to send only allowed documents to user.
- * Must be used inside publish callback by call function, like this: 
- *
- * Metheor.publish('example', function(){
- *     Vazco.Access.publish.call(this, cursor)
- * }
- *
- * @param {Object|Object[]} cursor - Meteor.Collection.Cursor or array of 
- * elements.
- */
-Vazco.Access.publish = function(cursor) {
-    if (_.isObject(cursor) || _.isArray(cursor)) {
-        var self = this;
-        var userObj = Meteor.users.findOne({_id: this.userId});
-        cursor.forEach(function(doc) {
-            if (doc.access) {
-                if (Vazco.Access.resolveAccess('show', doc.access, userObj)) {
-                    self.added(cursor._getCollectionName(), doc._id, doc);
-                }
-            }
-        });
-    }
-};
-
-// --------- Allow and deny function you can put as callbacks ----------
-
-Vazco.Access.allowUpdate = function(userId, doc) {
-    if (doc.access && doc.access.update) {
-        return this.resolveAccessArray(doc.access.update, userId);
-    }
-    return false;
-};
-
-Vazco.Access.denyUpdate = function(userId, doc) {
-    if (doc.access && doc.access.update) {
-        return !this.resolveAccessArray(doc.access.update, userId);
-    }
-};
-
-Vazco.Access.allowRemove = function(userId, doc) {
-    if (doc.access && doc.access.remove) {
-        return this.resolveAccessArray(doc.access.remove, userId);
-    }
-    return false;
-};
-
-Vazco.Access.denyRemove = function(userId, doc) {
-    if (doc.access && doc.access.remove) {
-        return !this.resolveAccessArray(doc.access.remove, userId);
-    }
-};
 
 //--------------- Methods for resolving access ------------------
 
 /**
  * Method resolves access based on access object
  * @param {string} type - Type of access to resolve (update, show etc.)
- * @param {Object} accessObj - Document access object.
+ * @param {Object} doc - Document object.
  * @param {string|Object} user - Either user object or userId.
  */
-Vazco.Access.resolveAccess = function(type, accessObj, user) {
-    if (accessObj && _.isString('type') && accessObj[type]) {
-        return this.resolveAccessArray(accessObj[type], user);
+Vazco.Access.resolve = function(type, doc, user) {
+    // Can't do anything if document is disabled.
+    if (doc && doc.disabled) {
+        return false;
+    }
+    var userObj = _.isObject(user) ? user : this._getUser(user);
+    // Check if adminOverride mode is on and override if user is admin.
+    if (this.adminOverride && userObj && userObj.admin) {
+        return true;
+    }
+    else if (doc.access && _.isString('type') && doc.access[type]) {
+        return this.resolveArray(doc.access[type], userObj);
     }
     return false;
 };
 
-Vazco.Access.resolveAccessArray = function(accessArray, user) {
-    var userObj = this._getUser(user);
-    // Check if adminOverride mode is on and override.
-    if(this.adminOverride && userObj.admin){
+Vazco.Access.resolveArray = function(accessArray, user) {
+    var userObj = _.isObject(user) ? user : this._getUser(user);
+    // Check if adminOverride mode is on and override if user is admin.
+    if (this.adminOverride && userObj && userObj.admin) {
         return true;
     }
     if (accessArray.length > 0) {
@@ -92,14 +47,13 @@ Vazco.Access.resolveAccessArray = function(accessArray, user) {
 
 //-------------------- Internal methods -----------------------
 
-Vazco.Access._getUser = function(user) {
-    // If user is string then search for user with this Id.
-    return _.isString(user) ? Meteor.users.findOne({_id: user}) : user;
+Vazco.Access._getUser = function(userId) {
+    return Meteor.users.findOne({_id: userId});
 };
 
 Vazco.Access._resolveSAGs = function(accessArray, userObj) {
     var SAGs = _.filter(this._SAGs, function(x) {
-        return _.intersection(accessArray, [x.name]).length > 0;
+        return _.intersection(accessArray, [x.id]).length > 0;
     });
     if (SAGs.length) {
         for (var i = 0; i < SAGs.length; i++) {
@@ -129,17 +83,60 @@ Vazco.Access._resolveGroup = function(accessArray, userObj) {
     return false;
 };
 
+//----------------------- Publish ------------------------
+
+/**
+ * Use inside Meteor.publish() callback to send only allowed documents to user.
+ * Must be used inside publish callback by call function, like this: 
+ *
+ * Metheor.publish('example', function(){
+ *     Vazco.Access.publish.call(this, cursor)
+ * }
+ *
+ * @param {Object|Object[]} cursor - Meteor.Collection.Cursor or array of 
+ * elements.
+ */
+Vazco.Access.publish = function(cursor) {
+    if (_.isObject(cursor) || _.isArray(cursor)) {
+        var self = this;
+        var userObj = Meteor.users.findOne({_id: this.userId});
+        cursor.forEach(function(doc) {
+            if (doc.access) {
+                if (Vazco.Access.resolve('show', doc, userObj)) {
+                    self.added(cursor._getCollectionName(), doc._id, doc);
+                }
+            }
+        });
+    }
+};
+
+// --------- Allow and deny function you can put as callbacks ----------
+
+Vazco.Access.allowUpdate = function(userId, doc) {
+    if (doc.access && doc.access.update) {
+        return this.resolve('update', doc, userId);
+    }
+    return false;
+};
+
+Vazco.Access.allowRemove = function(userId, doc) {
+    if (doc.access && doc.access.remove) {
+        return this.resolve('remove', doc, userId);
+    }
+    return false;
+};
+
 // ------------- Default Special access groups -------------------
 
 Vazco.Access._SAGs = [
     {
-        name: 'everyone',
+        id: 'everyone',
         predicate: function() {
             return true;
         }
     },
     {
-        name: 'logged',
+        id: 'logged',
         predicate: function(userObj) {
             if (userObj) {
                 return true;
@@ -153,39 +150,44 @@ Vazco.Access._SAGs = [
 
 /**
  * Method for adding special access group
- * @param {Object} SAG - Object containing fields name (string) and prediacate
- * (function).
+ * @param {string} id - SAG ID (used in access arrays)
+ * @param {function} predicate - one atribute function (user object) returns 
+ * boolean
  */
-Vazco.Access.addSAG = function(SAG) {
-    if (_.isObject(SAG)) {
+Vazco.Access.addSAG = function(id, predicate) {
+    if (_.isString(id) && _.isFunction(predicate)) {
         if (!_.find(this._SAGs, function(x) {
-            return x.name === SAG.name;
+            return x.id === id;
         })) {
-            this._SAGs.push(SAG);
+            this._SAGs.push(
+                    {
+                        id: id,
+                        predicate: predicate
+                    });
         }
         else {
-            throw new Error("SAG " + SAG.name + " already exists.");
+            throw new Error("SAG " + id + " already exists.");
         }
     }
     else {
-        throw new Error("Special access group (SAG) must be an object.");
+        throw new Error("Wrong parameters");
     }
 };
 
-Vazco.Access.removeSAG = function(SAGName) {
-    if (_.isString(SAGName)) {
+Vazco.Access.removeSAG = function(id) {
+    if (_.isString(id)) {
         var toDel = _.find(this._SAGs, function(x) {
-            return x.name === SAGName;
+            return x.id === id;
         });
         if (toDel) {
             this._SAGs.pop(toDel);
         }
         else {
-            throw new Error("removeSAG can't find " + SAGName);
+            throw new Error("removeSAG can't find " + id);
         }
     }
     else {
-        throw new Error("removeSAG argument must be string (SAG name)");
+        throw new Error("removeSAG argument must be string (SAG id)");
     }
 };
 
