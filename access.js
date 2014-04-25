@@ -110,7 +110,7 @@ Vazco.Access.publish = function(cursor) {
     }
 };
 
-// --------- Allow and deny function you can put as callbacks ----------
+// --------- Allow function you can put as callbacks ----------
 
 Vazco.Access.allowUpdate = function(userId, doc) {
     if (doc.access && doc.access.update) {
