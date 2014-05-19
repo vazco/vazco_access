@@ -1,5 +1,7 @@
 # Vazco Access
 
+## WORK IN PROGRESS! it does not work, contact me if you want to use it. czeslaaw@gmail.com
+
 Vazco-access allows to set a document level access/permission rules for showing, 
 editing and removing documents (or any other actions).
 
