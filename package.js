@@ -6,7 +6,9 @@ Package.describe({
 
 Package.on_use(function(api) {
     api.use(['vazco-tools-common', 'underscore', 'accounts-base'], ['client', 'server']);
+    api.use(['coffeescript'],['server']);
     api.add_files('access.js', ['client', 'server']);
+    api.add_files('publish_with_relations.coffee', ['server']);
 });
 
 Package.on_test(function(api) {
