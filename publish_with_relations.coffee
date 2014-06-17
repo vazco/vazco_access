@@ -1,4 +1,4 @@
-Vazco.Access.publishWithRelations = (params) ->
+Vazco.Access.publish = (params) ->
   pub = params.handle
   collection = params.collection
   associations = {}
@@ -43,7 +43,7 @@ Vazco.Access.publishWithRelations = (params) ->
       _.extend(mapFilter, mapping.filter)
       _.extend(mapOptions, mapping.options)
       if mapping.mappings
-        Meteor.publishWithRelations
+        Vazco.Access.publish
           handle: pub
           collection: mapping.collection
           filter: mapFilter
@@ -62,9 +62,9 @@ Vazco.Access.publishWithRelations = (params) ->
   collectionHandle = collection.find(filter, options).observe
     added: (document) ->
       if Vazco.Access.resolve('show', document, userObj)
-          pub.added(collection._name, document._id, document)
-          associations[document._id] ?= {}
-          doMapping(document._id, document, params.mappings)
+        pub.added(collection._name, document._id, document)
+        associations[document._id] ?= {}
+        doMapping(document._id, document, params.mappings)
 
     changed: (newDocument, oldDocument) ->
       oldAccess = Vazco.Access.resolve('show', oldDocument, userObj)
