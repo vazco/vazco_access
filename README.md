@@ -1,7 +1,5 @@
 # Vazco Access
 
-## WORK IN PROGRESS! it does not work, contact me if you want to use it. czeslaaw@gmail.com
-
 Vazco-access allows to set a document level access/permission rules for showing, 
 editing and removing documents (or any other actions).
 
@@ -26,12 +24,17 @@ Put access object inside document like this:
 
 ```js
 Meteor.publish('example', function() {
-    Vazco.Access.publish.call(this, ExampleCollection.find());
-    // do not return anything (or at least not ExampleCollection.find())
+    Vazco.Access.publish(
+            {
+                handle: this,
+                collection: Messages,
+                filter: {}
+            });
 });
 ```
 
-This function publishes ExampleCollection but you must be in show array to receive it.
+This function publishes ExampleCollection but you must be in show array to receive it. Vazco.Access.publish is modified
+meteor-publish-with-relations method. See https://github.com/svasva/meteor-publish-with-relations 
 
 ###Allow
 ```js

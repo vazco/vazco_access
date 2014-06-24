@@ -87,13 +87,13 @@ Vazco.Access._resolveGroup = function(accessArray, userObj) {
 
 /**
  * Use inside Meteor.publish() callback to send only allowed documents to user.
- * Must be used inside publish callback by call function, like this: 
+ * Must be used inside publish callback by call function, like this:
  *
  * Metheor.publish('example', function(){
  *     Vazco.Access.publish.call(this, cursor)
  * }
  *
- * @param {Object|Object[]} cursor - Meteor.Collection.Cursor or array of 
+ * @param {Object|Object[]} cursor - Meteor.Collection.Cursor or array of
  * elements.
  */
 Vazco.Access.publish = function(cursor) {
@@ -151,7 +151,7 @@ Vazco.Access._SAGs = [
 /**
  * Method for adding special access group
  * @param {string} id - SAG ID (used in access arrays)
- * @param {function} predicate - one atribute function (user object) returns 
+ * @param {function} predicate - one atribute function (user object) returns
  * boolean
  */
 Vazco.Access.addSAG = function(id, predicate) {
