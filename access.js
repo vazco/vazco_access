@@ -152,12 +152,12 @@ Vazco.Access._SAGs = {
 /**
  * Method for setting special access group
  * @param {string} id - SAG ID (used in access arrays)
- * @param {function} predicate - one atribute function (user object) returns
+ * @param {function} predicateFn - one atribute function (user object) returns
  * boolean
  */
-Vazco.Access.addSAG = function(id, predicate) {
-    if (_.isString(id) && _.isFunction(predicate)) {
-        this._SAGs[id] = predicate;
+Vazco.Access.addSAG = function(id, predicateFn) {
+    if (_.isString(id) && _.isFunction(predicateFn)) {
+        this._SAGs[id] = predicateFn;
     }
     else {
         throw new Error('Wrong parameters');
