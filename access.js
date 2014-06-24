@@ -113,6 +113,26 @@ Vazco.Access.publish = function(cursor) {
 
 // --------- Allow function you can put as callbacks ----------
 
+Vazco.Access.allowInsert = function(userId, doc, Collection) {
+    if (Collection.access && Collection.access.insert) {
+        var acs = doc.access;
+        doc.access = {
+            insert: Collection.access.insert
+        };
+        var result = this.resolve('insert', doc, userId);
+        doc.access = acs;
+        return result;
+    }
+    return false;
+};
+
+Vazco.Access.allowShow = function(userId, doc) {
+    if (doc.access && doc.access.show) {
+        return this.resolve('show', doc, userId);
+    }
+    return false;
+};
+
 Vazco.Access.allowUpdate = function(userId, doc) {
     if (doc.access && doc.access.update) {
         return this.resolve('update', doc, userId);
