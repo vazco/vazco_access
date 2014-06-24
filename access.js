@@ -1,3 +1,4 @@
+'use strict';
 Vazco.Access = {};
 
 //--------------- Methods for resolving access ------------------
@@ -15,7 +16,7 @@ Vazco.Access.resolve = function(type, doc, user) {
     }
     var userObj = _.isObject(user) ? user : this._getUser(user);
     // Check if adminOverride mode is on and override if user is admin.
-    if (this.adminOverride && userObj && userObj.admin) {
+    if (this.adminOverride && userObj && userObj.is_admin) {
         return true;
     }
     else if (doc.access && _.isString('type') && doc.access[type]) {
@@ -27,7 +28,7 @@ Vazco.Access.resolve = function(type, doc, user) {
 Vazco.Access.resolveArray = function(accessArray, user) {
     var userObj = _.isObject(user) ? user : this._getUser(user);
     // Check if adminOverride mode is on and override if user is admin.
-    if (this.adminOverride && userObj && userObj.admin) {
+    if (this.adminOverride && userObj && userObj.is_admin) {
         return true;
     }
     if (accessArray.length > 0) {
@@ -193,6 +194,6 @@ Vazco.Access.removeSAG = function(id) {
 
 //------------------- Variables ---------------
 
-// overrides access check if user doc has boolean "admin" field with value true
+// overrides access check if user doc has boolean "is_admin" field with value true
 // false by default
 Vazco.Access.adminOverride = false;
