@@ -20,12 +20,12 @@ Vazco.Access.resolve = function(type, doc, user) {
         return true;
     }
     else if (doc.access && _.isString('type') && doc.access[type]) {
-        return this.resolveArray(doc.access[type], userObj);
+        return this.resolveArray(doc.access[type], userObj, doc);
     }
     return false;
 };
 
-Vazco.Access.resolveArray = function(accessArray, user) {
+Vazco.Access.resolveArray = function(accessArray, user, doc) {
     var userObj = _.isObject(user) ? user : this._getUser(user);
     // Check if adminOverride mode is on and override if user is admin.
     if (this.adminOverride && userObj && userObj.is_admin) {
@@ -33,7 +33,7 @@ Vazco.Access.resolveArray = function(accessArray, user) {
     }
     if (accessArray.length > 0) {
         var _accessArray = _.isArray(accessArray) ? accessArray : [accessArray];
-        if (this._resolveSAGs(_accessArray, userObj)) {
+        if (this._resolveSAGs(_accessArray, userObj, doc)) {
             return true;
         }
         if (this._resolveUser(_accessArray, userObj)) {
@@ -52,13 +52,13 @@ Vazco.Access._getUser = function(userId) {
     return Meteor.users.findOne({_id: userId});
 };
 
-Vazco.Access._resolveSAGs = function(accessArray, userObj) {
-    var SAGs = _.filter(this._SAGs, function(x) {
-        return _.intersection(accessArray, [x.id]).length > 0;
+Vazco.Access._resolveSAGs = function(accessArray, userObj, doc) {
+    var SAGs = _.filter(this._SAGs, function(fn, key) {
+        return _.intersection(accessArray, [key]).length > 0;
     });
-    if (SAGs.length) {
-        for (var i = 0; i < SAGs.length; i++) {
-            if (this._resolveSAG(SAGs[i], userObj)) {
+    if (_.isObject(SAGs) && SAGs.length) {
+        for (var prop in SAGs) {
+            if (_.has(SAGs, prop) && _.isFunction(SAGs[prop]) && this._resolveSAG(SAGs[prop], userObj, doc)) {
                 return true;
             }
         }
@@ -66,8 +66,8 @@ Vazco.Access._resolveSAGs = function(accessArray, userObj) {
     return false;
 };
 
-Vazco.Access._resolveSAG = function(SAG, userObj) {
-    return SAG.predicate(userObj);
+Vazco.Access._resolveSAG = function(predicateFn, userObj, doc) {
+    return predicateFn(userObj, doc);
 };
 
 Vazco.Access._resolveUser = function(accessArray, userObj) {
@@ -129,62 +129,45 @@ Vazco.Access.allowRemove = function(userId, doc) {
 
 // ------------- Default Special access groups -------------------
 
-Vazco.Access._SAGs = [
-    {
-        id: 'everyone',
-        predicate: function() {
+Vazco.Access._SAGs = {
+    everyone: function () {
+        return true;
+    },
+    logged: function (userObj) {
+        if (userObj) {
             return true;
         }
+        return false;
     },
-    {
-        id: 'logged',
-        predicate: function(userObj) {
-            if (userObj) {
-                return true;
-            }
-            return false;
+    owner: function (userObj, doc) {
+        if (_.isObject(userObj) && _.isObject(doc) && userObj._id === doc.ownerId) {
+            return true;
         }
+        return false;
     }
-];
+};
 
 // ----------- Methods for adding/removing Special access groups -----------
 
 /**
- * Method for adding special access group
+ * Method for setting special access group
  * @param {string} id - SAG ID (used in access arrays)
  * @param {function} predicate - one atribute function (user object) returns
  * boolean
  */
 Vazco.Access.addSAG = function(id, predicate) {
     if (_.isString(id) && _.isFunction(predicate)) {
-        if (!_.find(this._SAGs, function(x) {
-            return x.id === id;
-        })) {
-            this._SAGs.push(
-                    {
-                        id: id,
-                        predicate: predicate
-                    });
-        }
-        else {
-            throw new Error("SAG " + id + " already exists.");
-        }
+        this._SAGs[id] = predicate;
     }
     else {
-        throw new Error("Wrong parameters");
+        throw new Error('Wrong parameters');
     }
 };
 
 Vazco.Access.removeSAG = function(id) {
     if (_.isString(id)) {
-        var toDel = _.find(this._SAGs, function(x) {
-            return x.id === id;
-        });
-        if (toDel) {
-            this._SAGs.pop(toDel);
-        }
-        else {
-            throw new Error("removeSAG can't find " + id);
+        if(_.isFunction(this._SAGs[id])){
+            delete this._SAGs[id];
         }
     }
     else {

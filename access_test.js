@@ -1,3 +1,4 @@
+'use strict';
 var users = {
     user: {
         _id: 'user'
@@ -8,7 +9,7 @@ var users = {
     },
     admin: {
         _id: 'admin',
-        admin: true
+        is_admin: true
     },
     sag: {
         _id: 'sag',
