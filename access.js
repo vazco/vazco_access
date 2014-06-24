@@ -144,6 +144,12 @@ Vazco.Access._SAGs = {
             return true;
         }
         return false;
+    },
+    admin: function (userObj) {
+        if (userObj.is_admin) {
+            return true;
+        }
+        return false;
     }
 };
 
