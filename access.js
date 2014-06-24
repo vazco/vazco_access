@@ -112,6 +112,11 @@ Vazco.Access.publish = function(cursor) {
 };
 
 // --------- Allow function you can put as callbacks ----------
+Vazco.Access.allowInsertGetFunction = function(Collection){
+    return function(userId, doc){
+        return Vazco.Access.allowInsert(userId, doc, Collection);
+    };
+};
 
 Vazco.Access.allowInsert = function(userId, doc, Collection) {
     if (Collection.access && Collection.access.insert) {
