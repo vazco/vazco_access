@@ -110,7 +110,7 @@ There are 2 built-in special group access:
 You can define your own special access group like this:
 
 ```js
-Vazco.Access.addSAG('moderators', function(userObj) {
+Vazco.Access.addSAG('moderators', function(userObj, doc) {
         if (userObj && userObj.is_moderator) {
             return true;
         }
