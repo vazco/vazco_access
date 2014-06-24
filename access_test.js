@@ -11,9 +11,9 @@ var users = {
         _id: 'admin',
         is_admin: true
     },
-    sag: {
-        _id: 'sag',
-        SAGFlag: true
+    sa: {
+        _id: 'sa',
+        SAFlag: true
     },
     no_access: {
         _id: 'no_access'
@@ -48,9 +48,9 @@ var docs = {
     },
     no_access_doc: {
     },
-    sag: {
+    sa: {
         access: {
-            show: ['irrelevant', 'testSAG', 'irrelevant2']
+            show: ['irrelevant', 'testSA', 'irrelevant2']
         }
     },
     everyone: {
@@ -76,8 +76,8 @@ if (Meteor.isServer) {
 
     Vazco.Access.adminOverride = true;
 
-    Vazco.Access.addSAG('testSAG', function(userObj) {
-        if (userObj && userObj.SAGFlag) {
+    Vazco.Access.addSA('testSA', function(userObj) {
+        if (userObj && userObj.SAFlag) {
             return true;
         }
         return false;
@@ -96,7 +96,7 @@ if (Meteor.isServer) {
         test.equal(false, Vazco.Access.resolve('show', docs.string_nope, user));
         test.equal(false, Vazco.Access.resolve('show', docs.nope, user));
         test.equal(false, Vazco.Access.resolve('show', docs.group, user));
-        test.equal(false, Vazco.Access.resolve('show', docs.sag, user));
+        test.equal(false, Vazco.Access.resolve('show', docs.sa, user));
         test.equal(false, Vazco.Access.resolve('show', docs.disabled, user));
         test.equal(false, Vazco.Access.resolve('show', docs.no_access_doc, user));
     });
@@ -113,7 +113,7 @@ if (Meteor.isServer) {
         test.equal(false, Vazco.Access.resolve('show', docs.string_nope, user));
         test.equal(false, Vazco.Access.resolve('show', docs.nope, user));
         test.equal(false, Vazco.Access.resolve('show', docs.no_access_doc, user));
-        test.equal(false, Vazco.Access.resolve('show', docs.sag, user));
+        test.equal(false, Vazco.Access.resolve('show', docs.sa, user));
         test.equal(false, Vazco.Access.resolve('show', docs.disabled, user));
         test.equal(false, Vazco.Access.resolve('show', docs.user, user));
 
@@ -127,7 +127,7 @@ if (Meteor.isServer) {
         test.equal(true, Vazco.Access.resolve('show', docs.nope, user));
         test.equal(true, Vazco.Access.resolve('show', docs.group, user));
         test.equal(true, Vazco.Access.resolve('show', docs.no_access_doc, user));
-        test.equal(true, Vazco.Access.resolve('show', docs.sag, user));
+        test.equal(true, Vazco.Access.resolve('show', docs.sa, user));
         test.equal(true, Vazco.Access.resolve('show', docs.everyone, user));
         test.equal(true, Vazco.Access.resolve('show', docs.logged, user));
 
@@ -135,10 +135,10 @@ if (Meteor.isServer) {
         test.equal(false, Vazco.Access.resolve('show', docs.disabled, user));
     });
 
-    Tinytest.add('Vazco Access - SAG test', function(test) {
-        var user = users.sag;
+    Tinytest.add('Vazco Access - SA test', function(test) {
+        var user = users.sa;
         // yep
-        test.equal(true, Vazco.Access.resolve('show', docs.sag, user));
+        test.equal(true, Vazco.Access.resolve('show', docs.sa, user));
         test.equal(true, Vazco.Access.resolve('show', docs.everyone, user));
         test.equal(true, Vazco.Access.resolve('show', docs.logged, user));
 
@@ -153,7 +153,7 @@ if (Meteor.isServer) {
 
     Tinytest.add('Vazco Access - User with no rights test', function(test) {
         var user = users.no_access;
-        // yep   
+        // yep
         test.equal(true, Vazco.Access.resolve('show', docs.everyone, user));
         test.equal(true, Vazco.Access.resolve('show', docs.logged, user));
 
@@ -162,13 +162,13 @@ if (Meteor.isServer) {
         test.equal(false, Vazco.Access.resolve('show', docs.string_nope, user));
         test.equal(false, Vazco.Access.resolve('show', docs.nope, user));
         test.equal(false, Vazco.Access.resolve('show', docs.group, user));
-        test.equal(false, Vazco.Access.resolve('show', docs.sag, user));
+        test.equal(false, Vazco.Access.resolve('show', docs.sa, user));
         test.equal(false, Vazco.Access.resolve('show', docs.no_access_doc, user));
         test.equal(false, Vazco.Access.resolve('show', docs.disabled, user));
     });
 
     Tinytest.add('Vazco Access - No user test', function(test) {
-        // yep    
+        // yep
         test.equal(true, Vazco.Access.resolve('show', docs.everyone, null));
 
         // nope
@@ -177,11 +177,11 @@ if (Meteor.isServer) {
         test.equal(false, Vazco.Access.resolve('show', docs.nope, null));
         test.equal(false, Vazco.Access.resolve('show', docs.group, null));
         test.equal(false, Vazco.Access.resolve('show', docs.no_access_doc, null));
-        test.equal(false, Vazco.Access.resolve('show', docs.sag, null));
+        test.equal(false, Vazco.Access.resolve('show', docs.sa, null));
         test.equal(false, Vazco.Access.resolve('show', docs.logged, null));
         test.equal(false, Vazco.Access.resolve('show', docs.disabled, null));
 
-        // yep    
+        // yep
         test.equal(true, Vazco.Access.resolve('show', docs.everyone));
 
         // nope
@@ -190,7 +190,7 @@ if (Meteor.isServer) {
         test.equal(false, Vazco.Access.resolve('show', docs.nope));
         test.equal(false, Vazco.Access.resolve('show', docs.group));
         test.equal(false, Vazco.Access.resolve('show', docs.no_access_doc));
-        test.equal(false, Vazco.Access.resolve('show', docs.sag));
+        test.equal(false, Vazco.Access.resolve('show', docs.sa));
         test.equal(false, Vazco.Access.resolve('show', docs.logged));
         test.equal(false, Vazco.Access.resolve('show', docs.disabled));
     });
