@@ -92,7 +92,11 @@ Vazco.Access._getUser = function (userId) {
 };
 
 // --------- Allow function you can put as callbacks ----------
-
+/**
+ *  Returns the function personalized for collection
+ * @param Collection
+ * @returns {Function} function(userId, doc) but it works only for Collection
+ */
 Vazco.Access.allowInsertGetFunction = function(Collection){
     return function(userId, doc){
         return Vazco.Access.allowInsert(userId, doc, Collection);
