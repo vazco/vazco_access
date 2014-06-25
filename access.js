@@ -154,10 +154,11 @@ Vazco.Access._SA = {
 // ----------- Methods for adding/removing Special access groups -----------
 
 /**
- * Method for setting special access group
- * @param {string} id - SA ID (used in access arrays)
- * @param {function} predicateFn - one atribute function (user object) returns
- * boolean
+ * Method for setting special access
+ * @param {string} id - SA ID (used in access arrays). Eg. everyone, admin, 
+ * moderators.
+ * @param {function} predicateFn - zero to 2 argument function 
+ * (user object and document). returns boolean
  */
 Vazco.Access.addSA = function (id, predicateFn) {
     if (_.isString(id) && _.isFunction(predicateFn)) {
