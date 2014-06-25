@@ -12,10 +12,12 @@ Vazco.Access.resolve = function (type, doc, user) {
     if (_.isString(type)) {
         if (this.globalAccess && this.globalAccess[type]) {
             globalResolve = this.resolveAccess(this.globalAccess[type], userObj, doc);
+            // check if globalAccess give conclusive result
             if(_.isBoolean(globalResolve)){
                 return globalResolve;
             }
         }
+        // if not check for local access
         if (doc.access && doc.access[type]) {
             localResolve = this.resolveAccess(doc.access[type], userObj, doc);
             if(_.isBoolean(localResolve)){
@@ -23,6 +25,7 @@ Vazco.Access.resolve = function (type, doc, user) {
             }
         }
     }
+    // if both global and local access don't give answer then deny access
     return false;
 };
 
@@ -31,24 +34,36 @@ Vazco.Access.resolveAccess = function (access, user, doc) {
 
     if (access) {
         if (_.isObject(access.deny) && this._resolveAll(access.deny, userObj, doc)) {
+            // if deny object exist and it is resolved with true then deny access
             return false;
         } else if (_.isObject(access.allow) && this._resolveAll(access.allow, userObj, doc)) {
+            // if allow object exist and it is resolved with true then grant access
             return true;
         }
     }
+    // if no conclusive answer then return undefined
 };
 
 //-------------------- Internal methods -----------------------
 
 Vazco.Access._resolveAll = function (accessObj, userObj, doc){
+    var userGroups,
+        userId;
+
+    // check special access
     if (_.isArray(accessObj.sa) && this._resolveSA(accessObj.sa, userObj, doc)) {
         return true;
     }
-    else if (_.isArray(accessObj.user) && this._resolveUser(accessObj.user, userObj)) {
-        return true;
-    }
-    else if (_.isArray(accessObj.group) && this._resolveGroup(accessObj.group, userObj)) {
-        return true;
+    if(userObj && userObj._id){
+        // check user id access
+        if (_.isArray(accessObj.user) && this._resolveUser(accessObj.user, userObj._id)) {
+            return true;
+        }
+        // check group id access
+        userGroups = this.getGroups(userObj)
+        if (_.isArray(accessObj.group) && userGroups && this._resolveGroup(accessObj.group, userObj)) {
+            return true;
+        }
     }
     return false;
 };
@@ -62,18 +77,12 @@ Vazco.Access._resolveSA = function (accessArray, userObj, doc) {
     });
 };
 
-Vazco.Access._resolveUser = function (accessArray, userObj) {
-    if (userObj && userObj._id) {
-        return _.intersection(accessArray, [userObj._id]).length > 0;
-    }
-    return false;
+Vazco.Access._resolveUser = function (accessArray, userId) {
+    return _.intersection(accessArray, [userId]).length > 0;
 };
 
-Vazco.Access._resolveGroup = function (accessArray, userObj) {
-    if (userObj) {
-        return _.intersection(accessArray, this.getGroups(userObj)).length > 0;
-    }
-    return false;
+Vazco.Access._resolveGroup = function (accessArray, userGroups) {
+    return _.intersection(accessArray, userGroups).length > 0;
 };
 
 Vazco.Access._getUser = function (userId) {
@@ -172,6 +181,8 @@ Vazco.Access.removeSA = function (id) {
 
 //-------------------- Getters ------------------------
 
+// default getter for user's groups. you can override this with your own
+// must return array
 Vazco.Access.getGroups = function (userObj) {
     if (userObj) {
         return userObj.access_groups;
