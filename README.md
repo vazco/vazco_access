@@ -72,9 +72,23 @@ ExampleCollection.access = {
         
 
 ExampleCollection.allow({
-    insert: Vazco.Access.allowInsert,
+    insert: Vazco.Access.allowInsertGetFunction(ExampleCollection),
     update: Vazco.Access.allowUpdate,
     remove: Vazco.Access.allowRemove,
+});
+
+or 
+
+ExampleCollection.allow({
+    insert: function(userId, doc){
+         return Vazco.Access.allowInsert(userId, doc, ExampleCollection);
+    },
+    update: function(userId, doc){
+         return Vazco.Access.allowUpdate(userId, doc);
+    },
+    remove: function(userId, doc){
+         return Vazco.Access.allowRemove(userId, doc);
+    }
 });
 ```
 Access from document will be used to resolve update and remove access.
