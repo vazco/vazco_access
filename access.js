@@ -78,11 +78,13 @@ Vazco.Access._resolveSA = function (accessArray, userObj, doc) {
 };
 
 Vazco.Access._resolveUser = function (accessArray, userId) {
-    return _.intersection(accessArray, [userId]).length > 0;
+    return _.contains(accessArray, userId);
 };
 
 Vazco.Access._resolveGroup = function (accessArray, userGroups) {
-    return _.intersection(accessArray, userGroups).length > 0;
+    return _.some(accessArray, function (a) {
+        return _.contains(userGroups, a);
+    });
 };
 
 Vazco.Access._getUser = function (userId) {
@@ -155,9 +157,9 @@ Vazco.Access._SA = {
 
 /**
  * Method for setting special access
- * @param {string} id - SA ID (used in access arrays). Eg. everyone, admin, 
+ * @param {string} id - SA ID (used in access arrays). Eg. everyone, admin,
  * moderators.
- * @param {function} predicateFn - zero to 2 argument function 
+ * @param {function} predicateFn - zero to 2 argument function
  * (user object and document). returns boolean
  */
 Vazco.Access.addSA = function (id, predicateFn) {
