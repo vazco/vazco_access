@@ -12,7 +12,7 @@ Vazco.Access.resolve = function (type, doc, user) {
     if (_.isString(type)) {
         if (this.globalAccess && this.globalAccess[type]) {
             globalResolve = this.resolveAccess(this.globalAccess[type], userObj, doc);
-            // check if globalAccess give conclusive result
+            // check if globalAccess gave conclusive result
             if(_.isBoolean(globalResolve)){
                 return globalResolve;
             }
@@ -25,7 +25,7 @@ Vazco.Access.resolve = function (type, doc, user) {
             }
         }
     }
-    // if both global and local access don't give answer then deny access
+    // if both global and local access did not give answer then deny access
     return false;
 };
 
