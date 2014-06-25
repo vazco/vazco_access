@@ -13,6 +13,7 @@ Package.on_use(function(api) {
 
 Package.on_test(function(api) {
     api.use([
+        'coffeescript',
         'vazco-tools-common',
         'vazco-access',
         'underscore',
@@ -20,5 +21,12 @@ Package.on_test(function(api) {
         'tinytest',
         'test-helpers'
     ], ['client', 'server']);
-    api.add_files('access_test.js', ['client', 'server']);
+
+    api.add_files([
+        'access_test.js'
+    ], ['client', 'server']);
+
+    api.add_files([
+        'publication_tests.coffee'
+    ], ['server']);
 });
