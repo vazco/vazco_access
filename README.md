@@ -1,3 +1,5 @@
+# DEPRECATED!!!
+
 # Vazco Access
 
 Vazco-access allows to set a document level access/permission rules for showing, 
@@ -12,11 +14,7 @@ Put access object inside document like this:
         show: ['_id of user/group who can see document', /*... more ...*/],
         update: ['_id of user/group who can edit document', /*... more ...*/],
         remove: ['_id of user/group who can remove document', /*... more ...*/],
-    },
-    /*rest
-    * of
-    * document
-    */
+    }
 }
 ```
 
