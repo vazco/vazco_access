@@ -72,7 +72,8 @@ Vazco.Access.publish = (params) ->
 
       if oldAccess and newAccess
         _.each newDocument, (value, key) ->
-          changedMappings = _.where(params.mappings, {key: key, reverse: false})
+          changedMappings = _.filter params.mappings, (mapping) ->
+            mapping.key is key and not mapping.reverse
           doMapping(newDocument._id, newDocument, changedMappings)
         pub.changed(collection._name, newDocument._id, newDocument)
 
