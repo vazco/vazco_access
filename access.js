@@ -60,8 +60,8 @@ Vazco.Access._resolveAll = function (accessObj, userObj, doc){
             return true;
         }
         // check group id access
-        userGroups = this.getGroups(userObj)
-        if (_.isArray(accessObj.group) && userGroups && this._resolveGroup(accessObj.group, userObj)) {
+        userGroups = this.getGroups(userObj);
+        if (_.isArray(accessObj.group) && userGroups && this._resolveGroup(accessObj.group, userGroups)) {
             return true;
         }
     }
