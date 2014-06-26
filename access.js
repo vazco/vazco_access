@@ -118,21 +118,21 @@ Vazco.Access.allowInsert = function(userId, doc, Collection) {
 
 Vazco.Access.allowShow = function(userId, doc) {
     if (doc.access) {
-        return this.resolve('show', doc, userId);
+        return Vazco.Access.resolve('show', doc, userId);
     }
     return false;
 };
 
 Vazco.Access.allowUpdate = function (userId, doc) {
     if (doc.access) {
-        return this.resolve('update', doc, userId);
+        return Vazco.Access.resolve('update', doc, userId);
     }
     return false;
 };
 
 Vazco.Access.allowRemove = function (userId, doc) {
     if (doc.access) {
-        return this.resolve('remove', doc, userId);
+        return Vazco.Access.resolve('remove', doc, userId);
     }
     return false;
 };
