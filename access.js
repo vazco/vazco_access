@@ -3,25 +3,35 @@ Vazco.Access = {};
 
 //--------------- Methods for resolving access ------------------
 
-Vazco.Access.resolve = function (type, doc, user) {
-    var globalResolve,
-        localResolve;
-
-    var userObj = _.isObject(user) ? user : this._getUser(user);
+Vazco.Access.resolve = function (type, doc, user, collection) {
+    var access = {allow: [], deny: []},
+        userObj = _.isObject(user) ? user : this._getUser(user),
+        self = this;
 
     if (_.isString(type)) {
         if (this.globalAccess && this.globalAccess[type]) {
-            globalResolve = this.resolveAccess(this.globalAccess[type], userObj, doc);
-            // check if globalAccess gave conclusive result
-            if(_.isBoolean(globalResolve)){
-                return globalResolve;
+            this._appendAccess(access, this.globalAccess[type]);
+        }
+        if (collection && collection.access && collection.access[type]) {
+            this._appendAccess(access, collection.access[type]);
+        }
+        if (doc && doc.access && doc.access[type]) {
+            this._appendAccess(access, doc.access[type]);
+        }
+
+        if (access.deny.length > 0) {
+            if (_(access.deny).some(function (acc) {
+                return self.resolveSingle(acc, userObj, doc);
+            })) {
+                return false;
             }
         }
-        // if not check for local access
-        if (doc.access && doc.access[type]) {
-            localResolve = this.resolveAccess(doc.access[type], userObj, doc);
-            if(_.isBoolean(localResolve)){
-                return localResolve;
+
+        if (access.allow.length > 0) {
+            if (_(access.allow).some(function (acc) {
+                return self.resolveSingle(acc, userObj, doc);
+            })) {
+                return true;
             }
         }
     }
@@ -42,6 +52,15 @@ Vazco.Access.resolveAccess = function (access, user, doc) {
         }
     }
     // if no conclusive answer then return undefined
+};
+
+Vazco.Access.resolveSingle = function (access, user, doc) {
+    var userObj = _.isObject(user) ? user : this._getUser(user);
+
+    if (_.isObject(access) && this._resolveAll(access, userObj, doc)) {
+        return true;
+    }
+    return false;
 };
 
 //-------------------- Internal methods -----------------------
@@ -89,6 +108,15 @@ Vazco.Access._resolveGroup = function (accessArray, userGroups) {
 
 Vazco.Access._getUser = function (userId) {
     return Meteor.users.findOne({_id: userId});
+};
+
+Vazco.Access._appendAccess = function (accessObj, access) {
+    if(access.allow){
+        accessObj.allow.push(access.allow)
+    }
+    if (access.deny){
+        accessObj.deny.push(access.deny)
+    }
 };
 
 // --------- Allow function you can put as callbacks ----------
