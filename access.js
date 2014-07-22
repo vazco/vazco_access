@@ -35,7 +35,7 @@ Vazco.Access.resolve = function (type, doc, user, collection) {
             }
         }
     }
-    // if both global and local access did not give answer then deny access
+    // if access did not give answer then deny access
     return false;
 };
 
