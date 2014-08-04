@@ -56,14 +56,15 @@ Vazco.Access.publish = (params) ->
         associations[id][objKey] =
           publishAssoc(mapping.collection, mapFilter, mapOptions)
 
-  filter = params.filter
-  options = params.options
+  filter = params.filter || {}
+  options = params.options || {}
   userObj = Meteor.users.findOne(pub.userId)
 
   if params.mappings
     collectionHandle = collection.find(filter, options).observe
       added: (document) ->
         if Vazco.Access.resolve('show', document, userObj)
+          console.log(document)
           pub.added(collection._name, document._id, document)
           associations[document._id] ?= {}
           doMapping(document._id, document, params.mappings)
