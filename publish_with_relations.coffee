@@ -7,12 +7,12 @@ Vazco.Access.publish = (params) ->
     collection.find(filter, options).observe
 
       added: (document) =>
-        if Vazco.Access.resolve('show', document, userObj)
+        if Vazco.Access.resolve('show', document, userObj, collection)
           pub.added(collection._name, document._id, document)
 
       changed: (newDocument, oldDocument) =>
-        oldAccess = Vazco.Access.resolve('show', oldDocument, userObj)
-        newAccess = Vazco.Access.resolve('show', newDocument, userObj)
+        oldAccess = Vazco.Access.resolve('show', oldDocument, userObj, collection)
+        newAccess = Vazco.Access.resolve('show', newDocument, userObj, collection)
 
         if oldAccess and newAccess
           diff = Vazco.Access.diff(oldDocument, newDocument)
@@ -25,7 +25,7 @@ Vazco.Access.publish = (params) ->
           @.removed(oldDocument)
 
       removed: (oldDocument) =>
-        if Vazco.Access.resolve('show', oldDocument, userObj)
+        if Vazco.Access.resolve('show', oldDocument, userObj, collection)
           pub.removed(collection._name, oldDocument._id)
 
   doMapping = (id, obj, mappings) ->
@@ -63,15 +63,14 @@ Vazco.Access.publish = (params) ->
   if params.mappings
     collectionHandle = collection.find(filter, options).observe
       added: (document) ->
-        if Vazco.Access.resolve('show', document, userObj)
-          console.log(document)
+        if Vazco.Access.resolve('show', document, userObj, collection)
           pub.added(collection._name, document._id, document)
           associations[document._id] ?= {}
           doMapping(document._id, document, params.mappings)
 
       changed: (newDocument, oldDocument) ->
-        oldAccess = Vazco.Access.resolve('show', oldDocument, userObj)
-        newAccess = Vazco.Access.resolve('show', newDocument, userObj)
+        oldAccess = Vazco.Access.resolve('show', oldDocument, userObj, collection)
+        newAccess = Vazco.Access.resolve('show', newDocument, userObj, collection)
 
         if oldAccess and newAccess
           _.each newDocument, (value, key) ->
@@ -88,7 +87,7 @@ Vazco.Access.publish = (params) ->
           @.removed(newDocument)
 
       removed: (oldDocument) ->
-        if Vazco.Access.resolve('show', oldDocument, userObj)
+        if Vazco.Access.resolve('show', oldDocument, userObj, collection)
           handle.stop() for handle in associations[oldDocument._id]
           pub.removed(collection._name, oldDocument._id)
   else
