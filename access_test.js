@@ -136,4 +136,126 @@ if (Meteor.isClient) {
         test.equal(false, Vazco.Access.resolve('show', docs.no_access_doc));
         test.equal(false, Vazco.Access.resolve('show', docs.disabled));
     });
+
+    Tinytest.add('Vazco Access - Diff test', function (test) {
+        test.equal(Vazco.Access.diff({
+            a: 1,
+            b: 2
+        }, {
+            a: 1,
+            b: 2
+        }), {});
+
+        test.equal(Vazco.Access.diff({
+            a: 1,
+            b: 2
+        }, {
+            a: 1,
+            b: 'diff'
+        }), {b: 'diff'});
+
+        test.equal(Vazco.Access.diff({
+            a: 1,
+            b: 2
+        }, {
+            a: 1
+        }), {b: undefined});
+
+        test.equal(Vazco.Access.diff({
+            a: {a: 3}
+        }, {
+            a: {a: 3}
+        }), {});
+
+        test.equal(Vazco.Access.diff({
+            a: {
+                a: 1,
+                b: 2
+            }
+        }, {
+            a: {
+                a: 1,
+                b: 'diff'
+            }
+        }), {
+            a: {
+                a: 1,
+                b: 'diff'
+            }
+        });
+
+        test.equal(Vazco.Access.diff({
+            a: {
+                a: 1,
+                b: 2
+            }
+        }, {
+            a: {
+                a: 1
+            }
+        }), {a: {
+            a: 1
+        }});
+
+        test.equal(Vazco.Access.diff({
+            a: {
+                a: 1,
+                b: 2
+            }
+        }, {
+            a: 3
+        }), {a: 3});
+
+        test.equal(Vazco.Access.diff({
+            a: {
+                a: 1,
+                c: 3
+            }
+        }, {
+            a: {
+                a: 1,
+                b: 2,
+                c: 3
+            }
+        }), {a: {
+            a: 1,
+            b: 2,
+            c: 3
+        }});
+
+        test.equal(Vazco.Access.diff({
+            a: {
+                a: 1,
+                b: 2,
+                c: 3
+            },
+            b: 3
+        }, {
+            b: 3
+        }), {
+            a: undefined
+        });
+
+        test.equal(Vazco.Access.diff({
+            a: [1,2,4],
+            b: {}
+        }, {
+            a: 1,
+            b: {g:4}
+        }), {
+            a: 1,
+            b: {g:4}
+        });
+
+        test.equal(Vazco.Access.diff({
+            a: [1,2,4],
+            b: {},
+            c: 'string'
+        }, {}
+        ), {
+            a: undefined,
+            b: undefined,
+            c: undefined
+        });
+    });
 }

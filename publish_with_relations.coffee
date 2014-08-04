@@ -15,13 +15,14 @@ Vazco.Access.publish = (params) ->
         newAccess = Vazco.Access.resolve('show', newDocument, userObj)
 
         if oldAccess and newAccess
-          pub.changed(collection._name, newDocument._id, newDocument)
+          diff = Vazco.Access.diff(oldDocument, newDocument)
+          pub.changed(collection._name, newDocument._id, diff)
 
         else if !oldAccess and newAccess
-          pub.added(collection._name, newDocument._id, newDocument)
+          @.added(newDocument)
 
         else if oldAccess and !newAccess
-          pub.removed(collection._name, newDocument._id)
+          @.removed(oldDocument)
 
       removed: (oldDocument) =>
         if Vazco.Access.resolve('show', oldDocument, userObj)
@@ -76,16 +77,14 @@ Vazco.Access.publish = (params) ->
             changedMappings = _.filter params.mappings, (mapping) ->
               mapping.key is key and not mapping.reverse
             doMapping(newDocument._id, newDocument, changedMappings)
-          pub.changed(collection._name, newDocument._id, newDocument)
+          diff = Vazco.Access.diff(oldDocument, newDocument)
+          pub.changed(collection._name, newDocument._id, diff)
 
         else if !oldAccess and newAccess
-          pub.added(collection._name, newDocument._id, newDocument)
-          associations[newDocument._id] ?= {}
-          doMapping(newDocument._id, newDocument, params.mappings)
+          @.added(newDocument)
 
         else if oldAccess and !newAccess
-          handle.stop() for handle in associations[newDocument._id]
-          pub.removed(collection._name, newDocument._id)
+          @.removed(newDocument)
 
       removed: (oldDocument) ->
         if Vazco.Access.resolve('show', oldDocument, userObj)

@@ -195,3 +195,20 @@ Vazco.Access.getGroups = function (userObj) {
         return userObj.access_groups;
     }
 };
+
+// ---------------- Utils ----------------------------------
+
+Vazco.Access.diff = function (doc1, doc2) {
+    var diff = {};
+    for (var key in doc1) {
+        if (!EJSON.equals(doc1[key],doc2[key])) {
+            diff[key] = doc2[key];
+        }
+    }
+    for (var key in doc2) {
+        if (!doc1[key]) {
+            diff[key] = doc2[key];
+        }
+    }
+    return diff;
+};
