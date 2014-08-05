@@ -11,7 +11,7 @@ Put access object inside document like this (example):
     access: {
         show: {
             allow: {
-                sa: ['everone', 'owner'],
+                sa: ['everyone', 'owner'],
                 user: ['LtdsBwrM', '8ywdGv9R']
             },
             deny: {

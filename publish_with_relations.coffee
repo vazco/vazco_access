@@ -3,30 +3,6 @@ Vazco.Access.publish = (params) ->
   collection = params.collection
   associations = {}
 
-  publishAssoc = (collection, filter, options) ->
-    collection.find(filter, options).observe
-
-      added: (document) =>
-        if Vazco.Access.resolve('show', document, userObj, collection)
-          pub.added(collection._name, document._id, document)
-
-      changed: (newDocument, oldDocument) =>
-        oldAccess = Vazco.Access.resolve('show', oldDocument, userObj, collection)
-        newAccess = Vazco.Access.resolve('show', newDocument, userObj, collection)
-
-        if oldAccess and newAccess
-          pub.changed(collection._name, newDocument._id, newDocument)
-
-        else if !oldAccess and newAccess
-          pub.added(collection._name, newDocument._id, newDocument)
-
-        else if oldAccess and !newAccess
-          pub.removed(collection._name, newDocument._id)
-
-      removed: (oldDocument) =>
-        if Vazco.Access.resolve('show', oldDocument, userObj, collection)
-          pub.removed(collection._name, oldDocument._id)
-
   doMapping = (id, obj, mappings) ->
     return unless mappings
     for mapping in mappings
@@ -53,46 +29,64 @@ Vazco.Access.publish = (params) ->
       else
         associations[id][objKey]?.stop()
         associations[id][objKey] =
-          publishAssoc(mapping.collection, mapFilter, mapOptions)
+          publishSimple(mapping.collection, mapFilter, mapOptions)
 
-  filter = params.filter
-  options = params.options
+  addedHandler = (document, collection) ->
+    if Vazco.Access.resolve('show', document, userObj, collection)
+      pub.added(collection._name, document._id, document)
+      true
+
+  changedHandler = (newDocument, oldDocument, collection) ->
+    oldAccess = Vazco.Access.resolve('show', oldDocument, userObj, collection)
+    if !oldAccess
+      return @.added(newDocument)
+
+    newAccess = Vazco.Access.resolve('show', newDocument, userObj, collection)
+    if oldAccess and !newAccess
+      return @.removed(newDocument)
+
+    if oldAccess and newAccess
+      diff = Vazco.Access.diff(oldDocument, newDocument)
+      pub.changed(collection._name, newDocument._id, diff)
+      true
+
+  removedHandler = (oldDocument, collection) ->
+    try
+      pub.removed(collection._name, oldDocument._id)
+
+  publishSimple = (collection, filter, options) ->
+    collection.find(filter, options).observe
+      added: (document) ->
+        addedHandler.call(@, document, collection)
+      changed: (newDocument, oldDocument) ->
+        changedHandler.call(@, newDocument, oldDocument, collection)
+      removed: (oldDocument) ->
+        removedHandler.call(@, oldDocument, collection)
+
+  filter = params.filter || {}
+  options = params.options || {}
   userObj = Meteor.users.findOne(pub.userId)
 
   if params.mappings
     collectionHandle = collection.find(filter, options).observe
       added: (document) ->
-        if Vazco.Access.resolve('show', document, userObj, collection)
-          pub.added(collection._name, document._id, document)
+        if addedHandler.call(@, document, collection)
           associations[document._id] ?= {}
           doMapping(document._id, document, params.mappings)
 
       changed: (newDocument, oldDocument) ->
-        oldAccess = Vazco.Access.resolve('show', oldDocument, userObj, collection)
-        newAccess = Vazco.Access.resolve('show', newDocument, userObj, collection)
-
-        if oldAccess and newAccess
+        if changedHandler.call(@, newDocument, oldDocument, collection)
           _.each newDocument, (value, key) ->
             changedMappings = _.filter params.mappings, (mapping) ->
               mapping.key is key and not mapping.reverse
             doMapping(newDocument._id, newDocument, changedMappings)
-          pub.changed(collection._name, newDocument._id, newDocument)
-
-        else if !oldAccess and newAccess
-          pub.added(collection._name, newDocument._id, newDocument)
-          associations[newDocument._id] ?= {}
-          doMapping(newDocument._id, newDocument, params.mappings)
-
-        else if oldAccess and !newAccess
-          handle.stop() for handle in associations[newDocument._id]
-          pub.removed(collection._name, newDocument._id)
 
       removed: (oldDocument) ->
-        if Vazco.Access.resolve('show', oldDocument, userObj, collection)
+        if oldDocument
+          removedHandler.call(@, oldDocument, collection)
           handle.stop() for handle in associations[oldDocument._id]
-          pub.removed(collection._name, oldDocument._id)
   else
-    collectionHandle = publishAssoc(collection, filter, options)
+    collectionHandle = publishSimple(collection, filter, options)
 
   pub.ready() unless params._noReady
 
