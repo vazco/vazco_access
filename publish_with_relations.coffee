@@ -38,14 +38,10 @@ Vazco.Access.publish = (params) ->
 
   changedHandler = (newDocument, oldDocument, collection) ->
     oldAccess = Vazco.Access.resolve('show', oldDocument, userObj, collection)
-    console.log(oldDocument)
-    console.log(newDocument)
-    console.log(oldAccess)
     if !oldAccess
       return @.added(newDocument)
 
     newAccess = Vazco.Access.resolve('show', newDocument, userObj, collection)
-    console.log(newAccess)
     if oldAccess and !newAccess
       return @.removed(newDocument)
 
