@@ -56,19 +56,15 @@ Vazco.Access.publish = function(params) {
         }
     };
     changedHandler = function(newDocument, oldDocument, collection) {
-        var diff, newAccess, oldAccess;
+        var diff, newAccess;
         if(!pub._documents[collection._name] || !pub._documents[collection._name][newDocument._id]) {
-            return;
-        }
-        oldAccess = Vazco.Access.resolve('show', oldDocument, userObj, collection);
-        if (!oldAccess) {
-            return this.added(newDocument);
+            return this.addedHandler(newDocument, collection);
         }
         newAccess = Vazco.Access.resolve('show', newDocument, userObj, collection);
-        if (oldAccess && !newAccess) {
-            return this.removed(newDocument);
+        if (!newAccess) {
+            return this.removedHandler(newDocument, collection);
         }
-        if (oldAccess && newAccess) {
+        if (newAccess) {
             diff = Vazco.Access.diff(oldDocument, newDocument);
             pub.changed(collection._name, newDocument._id, diff);
             return true;
