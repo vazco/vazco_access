@@ -58,11 +58,11 @@ Vazco.Access.publish = function(params) {
     changedHandler = function(newDocument, oldDocument, collection) {
         var diff, newAccess;
         if(!pub._documents[collection._name] || !pub._documents[collection._name][newDocument._id]) {
-            return this.addedHandler(newDocument, collection);
+            return addedHandler.call(this, newDocument, collection);
         }
         newAccess = Vazco.Access.resolve('show', newDocument, userObj, collection);
         if (!newAccess) {
-            return this.removedHandler(newDocument, collection);
+            return removedHandler.call(this, newDocument, collection);
         }
         if (newAccess) {
             diff = Vazco.Access.diff(oldDocument, newDocument);
