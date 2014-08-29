@@ -48,11 +48,13 @@ Vazco.Access.publish = function(params) {
         return _results;
     };
     addedHandler = function(document, collection) {
-        if (Vazco.Access.resolve('show', document, userObj, collection) && (!limit || (limit && this._i <= limit))) {
-            document._query_limit = limit;
-            pub.added(collection._name, document._id, document);
-            ++this._i;
-            return true;
+        if (Vazco.Access.resolve('show', document, userObj, collection)) {
+            if(pub._ready || (!limit || (limit && this._i <= limit))){
+                document._query_limit = limit;
+                pub.added(collection._name, document._id, document);
+                ++this._i;
+                return true;
+            }
         }
     };
     changedHandler = function(newDocument, oldDocument, collection) {
@@ -74,7 +76,6 @@ Vazco.Access.publish = function(params) {
         if(!pub._documents[collection._name] || !pub._documents[collection._name][oldDocument._id]) {
             return;
         }
-
 //        --this._i; // I don't know if decrement is good option
 //        try {
             return pub.removed(collection._name, oldDocument._id);
