@@ -50,7 +50,6 @@ Vazco.Access.publish = function(params) {
     addedHandler = function(document, collection) {
         if (Vazco.Access.resolve('show', document, userObj, collection)) {
             if(pub._ready || (!limit || (limit && this._i <= limit))){
-                document._query_limit = limit;
                 pub.added(collection._name, document._id, document);
                 ++this._i;
                 return true;
