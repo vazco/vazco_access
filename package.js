@@ -1,11 +1,12 @@
 'use strict';
 
 Package.describe({
-    summary: 'Vazco Access'
+    summary: 'Vazco Access',
+    name: 'vazco:access'
 });
 
 Package.on_use(function(api) {
-    api.use(['vazco-tools-common', 'underscore', 'accounts-base'], ['client', 'server']);
+    api.use(['vazco:tools-common', 'underscore', 'accounts-base'], ['client', 'server']);
     api.add_files('access.js', ['client', 'server']);
     api.add_files('publication.js', ['server']);
 });
@@ -13,8 +14,8 @@ Package.on_use(function(api) {
 Package.on_test(function(api) {
     api.use([
         'coffeescript',
-        'vazco-tools-common',
-        'vazco-access',
+        'vazco:tools-common',
+        'vazco:access',
         'underscore',
         'accounts-base',
         'tinytest',
