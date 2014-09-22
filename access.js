@@ -130,12 +130,33 @@ Vazco.Access.allowInsertGetFunction = function(Collection){
         return Vazco.Access.allowInsert(userId, doc, Collection);
     };
 };
+/**
+ *  Returns "allow update" function personalized for collection
+ * @param Collection
+ * @returns {Function} function(userId, doc, fieldNames, modifier) but it works only for Collection
+ */
+Vazco.Access.allowUpdateGetFunction = function(Collection){
+    return function(userId, doc, fieldNames, modifier){
+        return Vazco.Access.allowUpdate(userId, doc, fieldNames, modifier, Collection);
+    };
+};
+/**
+ *  Returns the function personalized for collection
+ * @param Collection
+ * @returns {Function} function(userId, doc) but it works only for Collection
+ */
+Vazco.Access.allowRemoveGetFunction = function(Collection){
+    return function(userId, doc){
+        return Vazco.Access.allowRemove(userId, doc, Collection);
+    };
+};
 
 Vazco.Access.allowInsert = function(userId, doc, Collection) {
-    if (Collection.access && Collection.access.insert) {
+    if ((Collection.access && Collection.access.insert)
+        || (_.isArray(this.globalAccess) && this.globalAccess['insert'])) {
         var acs = doc.access;
         doc.access = {
-            insert: Collection.access.insert
+            insert: Vazco.get(Collection, 'access.insert')
         };
         var result = this.resolve('insert', doc, userId);
         doc.access = acs;
@@ -144,23 +165,23 @@ Vazco.Access.allowInsert = function(userId, doc, Collection) {
     return false;
 };
 
-Vazco.Access.allowShow = function(userId, doc) {
-    if (doc.access) {
-        return Vazco.Access.resolve('show', doc, userId);
+Vazco.Access.allowShow = function(userId, doc, Collection) {
+    if (doc.access || Collection || (_.isArray(this.globalAccess) && this.globalAccess['show'])) {
+        return Vazco.Access.resolve('show', doc, userId, Collection);
     }
     return false;
 };
 
-Vazco.Access.allowUpdate = function (userId, doc) {
-    if (doc.access) {
-        return Vazco.Access.resolve('update', doc, userId);
+Vazco.Access.allowUpdate = function (userId, doc, fieldNames, modifier, Collection) {
+    if (doc.access || Collection || (_.isArray(this.globalAccess) && this.globalAccess['update'])) {
+        return Vazco.Access.resolve('update', doc, userId, Collection);
     }
     return false;
 };
 
-Vazco.Access.allowRemove = function (userId, doc) {
-    if (doc.access) {
-        return Vazco.Access.resolve('remove', doc, userId);
+Vazco.Access.allowRemove = function (userId, doc, Collection) {
+    if (doc.access || Collection || (_.isArray(this.globalAccess) && this.globalAccess['remove'])) {
+        return Vazco.Access.resolve('remove', doc, userId, Collection);
     }
     return false;
 };
