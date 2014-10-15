@@ -53,9 +53,34 @@ Meteor.publish('example', function() {
 });
 ```
 
-This function publishes ExampleCollection but you must have show access to receive it. 
-Vazco.Access.publish is modified meteor-publish-with-relations method. 
-See https://github.com/svasva/meteor-publish-with-relations 
+This function publishes ExampleCollection but you must have show access to receive it.
+```js
+Meteor.publish('example', function() {
+    Vazco.Access.publish(
+            {
+                handle: this,
+                collection: ExampleCollection,
+                filter: {created_by: 'a897qb'},
+                options: {
+                          limit: 10,
+                          sort: { createdAt: -1 }
+                        }
+                mappings: [{
+                        key: 'authorId',
+                        collection: Meteor.users
+                      }, {
+                        reverse: true,
+                        key: 'postId',
+                        collection: Comments,
+                        filter: { approved: true },
+                        options: {
+                          limit: 10,
+                          sort: { createdAt: -1 }
+                        }
+                      }]
+                });
+      });
+```
 
 ###Allow
 ```js
@@ -73,8 +98,8 @@ ExampleCollection.access = {
 
 ExampleCollection.allow({
     insert: Vazco.Access.allowInsertGetFunction(ExampleCollection),
-    update: Vazco.Access.allowUpdate,
-    remove: Vazco.Access.allowRemove,
+    update: Vazco.Access.allowUpdateGetFunction(ExampleCollection),
+    remove: Vazco.Access.allowRemoveGetFunction(ExampleCollection),
 });
 
 or 
@@ -83,11 +108,11 @@ ExampleCollection.allow({
     insert: function(userId, doc){
          return Vazco.Access.allowInsert(userId, doc, ExampleCollection);
     },
-    update: function(userId, doc){
-         return Vazco.Access.allowUpdate(userId, doc);
+    update: function(userId, doc, fieldNames, modifier){
+         return Vazco.Access.allowUpdate(userId, doc, fieldNames, modifier, ExampleCollection);
     },
     remove: function(userId, doc){
-         return Vazco.Access.allowRemove(userId, doc);
+         return Vazco.Access.allowRemove(userId, doc, ExampleCollection);
     }
 });
 ```
@@ -96,7 +121,7 @@ For insert you need to specify access object for all collection (like in example
 
 ## Methods
 
-**Vazco.Access.resolve(type, doc, user);**
+**Vazco.Access.resolve(type, doc, user, collection);**
 
 Takes action type (string), document and user object or id and resolve access.
 
@@ -146,13 +171,15 @@ There are few built-in special group access:
 
 **everyone** - every user.
 **logged** - every logged user.
+**admin** - every admin user.
+**owner** - Only owner.
 
 Check source for more.
 
 You can define your own special access group like this:
 
 ```js
-Vazco.Access.addSA('is_owner', function(userObj, doc) {
+Vazco.Access.addSA('is_creator', function(userObj, doc) {
         if (userObj && doc && doc.created_by === userObj._id) {
             return true;
         }
