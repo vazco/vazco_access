@@ -80,7 +80,7 @@ Meteor.publish('example', function() {
                       }]
                 });
       });
-      ```
+```
 
 ###Allow
 ```js
