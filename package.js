@@ -2,7 +2,9 @@
 
 Package.describe({
     summary: 'Vazco Access',
-    name: 'vazco:access'
+    name: 'vazco:access',
+    version: "1.0.0",
+    git: "https://cristo-rabani@bitbucket.org/vazco/m_vazco_access.git"
 });
 
 Package.on_use(function(api) {
