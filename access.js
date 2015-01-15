@@ -5,7 +5,7 @@ Vazco.Access = {};
 
 Vazco.Access.resolve = function (type, doc, user, collection) {
     var access = {allow: [], deny: []},
-        userObj = _.isObject(user) ? user : this._getUser(user),
+        userObj = this._getUser(user),
         self = this;
 
     if (_.isString(type)) {
@@ -40,7 +40,7 @@ Vazco.Access.resolve = function (type, doc, user, collection) {
 };
 
 Vazco.Access.resolveAccess = function (access, user, doc) {
-    var userObj = _.isObject(user) ? user : this._getUser(user);
+    var userObj = this._getUser(user);
 
     if (access) {
         if (_.isObject(access.deny) && this._resolveAll(access.deny, userObj, doc)) {
@@ -55,7 +55,7 @@ Vazco.Access.resolveAccess = function (access, user, doc) {
 };
 
 Vazco.Access.resolveSingle = function (access, user, doc) {
-    var userObj = _.isObject(user) ? user : this._getUser(user);
+    var userObj = this._getUser(user);
 
     if (_.isObject(access) && this._resolveAll(access, userObj, doc)) {
         return true;
@@ -107,15 +107,22 @@ Vazco.Access._resolveGroup = function (accessArray, userGroups) {
 };
 
 Vazco.Access._getUser = function (userId) {
-    return Meteor.users.findOne({_id: userId});
+    if(_.isObject(userId) && userId._id){
+        userId = userId._id;
+    }
+    var usersColl = Meteor.users;
+    if(typeof UniUsers === 'object'){
+        usersColl = UniUsers;
+    }
+    return usersColl.findOne({_id: userId});
 };
 
 Vazco.Access._appendAccess = function (accessObj, access) {
     if(access.allow){
-        accessObj.allow.push(access.allow)
+        accessObj.allow.push(access.allow);
     }
     if (access.deny){
-        accessObj.deny.push(access.deny)
+        accessObj.deny.push(access.deny);
     }
 };
 

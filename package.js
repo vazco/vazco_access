@@ -3,8 +3,8 @@
 Package.describe({
     summary: 'Vazco Access',
     name: 'vazco:access',
-    version: "1.0.1",
-    git: "https://github.com/vazco/vazco_access.git"
+    version: '1.0.3',
+    git: 'https://github.com/vazco/vazco_access.git'
 });
 
 Package.on_use(function(api) {
@@ -25,6 +25,8 @@ Package.on_test(function(api) {
         'tinytest',
         'test-helpers'
     ], ['client', 'server']);
+
+    api.use(['vazco:universe-core@0.9.2'], ['client', 'server'], {weak: true});
 
     api.add_files([
         'access_test.js'
