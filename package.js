@@ -3,14 +3,14 @@
 Package.describe({
     summary: 'Vazco Access',
     name: 'vazco:access',
-    version: '1.0.3',
+    version: '1.0.4',
     git: 'https://github.com/vazco/vazco_access.git'
 });
 
 Package.on_use(function(api) {
-    api.versionsFrom('METEOR@0.9.3');
-    api.use(['vazco:tools-common@1.0.0', 'underscore', 'accounts-base'], ['client', 'server']);
-    api.imply('vazco:tools-common');
+    api.versionsFrom('METEOR@0.9.4');
+    api.use(['vazco:universe-core@1.1.0', 'underscore', 'accounts-base'], ['client', 'server']);
+    api.imply('vazco:universe-core');
     api.add_files('access.js', ['client', 'server']);
     api.add_files('publication.js', ['server']);
 });
@@ -18,15 +18,13 @@ Package.on_use(function(api) {
 Package.on_test(function(api) {
     api.use([
         'coffeescript',
-        'vazco:tools-common',
+        'vazco:universe-core@1.1.0',
         'vazco:access',
         'underscore',
         'accounts-base',
         'tinytest',
         'test-helpers'
     ], ['client', 'server']);
-
-    api.use(['vazco:universe-core@0.9.2'], ['client', 'server'], {weak: true});
 
     api.add_files([
         'access_test.js'
