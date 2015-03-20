@@ -89,11 +89,16 @@ Vazco.Access._resolveAll = function (accessObj, userObj, doc){
 
 Vazco.Access._resolveSA = function (accessArray, userObj, doc) {
     var self = this;
-    return _.some(accessArray, function (access) {
-        if (self._SA[access]) {
-            return self._SA[access](userObj, doc);
-        }
-    });
+    try{
+        return _.some(accessArray, function (access) {
+            if (self._SA[access]) {
+                return self._SA[access](userObj, doc);
+            }
+        });
+    } catch(e){
+        console.error(e);
+    }
+    return;
 };
 
 Vazco.Access._resolveUser = function (accessArray, userId) {

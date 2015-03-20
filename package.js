@@ -3,7 +3,7 @@
 Package.describe({
     summary: 'Vazco Access',
     name: 'vazco:access',
-    version: "1.0.1",
+    version: "1.0.5",
     git: "https://github.com/vazco/vazco_access.git"
 });
 
