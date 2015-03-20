@@ -82,7 +82,7 @@ Meteor.publish('example', function() {
       });
 ```
 
-###Allow
+### Allow
 ```js
 ExampleCollection.access = {
     insert: {
