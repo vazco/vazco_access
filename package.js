@@ -9,7 +9,7 @@ Package.describe({
 
 Package.on_use(function(api) {
     api.versionsFrom('METEOR@1.0.4');
-    api.use(['vazco:universe-core@1.6.5', 'underscore', 'accounts-base'], ['client', 'server']);
+    api.use(['vazco:universe-core@1.6.7', 'underscore', 'accounts-base'], ['client', 'server']);
     api.imply('vazco:tools-common');
     api.add_files('access.js', ['client', 'server']);
     api.add_files('publication.js', ['server']);
