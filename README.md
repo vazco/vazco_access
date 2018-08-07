@@ -10,8 +10,6 @@
 
 &nbsp;
 
-# Vazco Access
-
 Vazco-access allows to set a document level access/permission rules for showing, 
 editing and removing documents (or any other actions).
 
