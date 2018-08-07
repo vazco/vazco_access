@@ -1,3 +1,15 @@
+<h1 align="center">
+    <a href="https://github.com/vazco">vazco</a>/Vazco Access
+</h1>
+
+&nbsp;
+
+<h3 align="center">
+  -- Abandonware. This package is deprecated! --
+</h3>
+
+&nbsp;
+
 # Vazco Access
 
 Vazco-access allows to set a document level access/permission rules for showing, 
@@ -263,3 +275,9 @@ Inside of this:
 **Special access rules -> User id rules -> Group id rules**
 
 Resolving will stop when it reach conclusive (deny or allow hit) result.
+
+## License
+
+<img src="https://vazco.eu/banner.png" align="right">
+
+**Like every package maintained by [Vazco](https://vazco.eu/), Vazco Access is [MIT licensed](https://github.com/vazco/uniforms/blob/master/LICENSE).**
